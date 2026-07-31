@@ -127,23 +127,26 @@ app.use("/",userRouter);
 //     res.send("successful testing")
 // }));
 
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+});
+
 app.all("*splat", (req, res, next) => {
   next(new ExpressError(404, "Page Not Found"))
 });
 
 app.use((err, req, res, next) => {
-  let { statusCode = 500, message = "Something went wrong" } = err;
-  res.status(statusCode).render("error.ejs", {
-    err,
-    currUser: req.user,
-    success: req.flash("success"),
-    error: req.flash("error"),
-  });
-})
+    console.error("FULL ERROR:");
+    console.error(err);
 
-app.listen(8080, () => {
-    console.log("Server is Listening")
-})
+    res.status(err.statusCode || 500).send(err.stack);
+});
+
+const port = process.env.PORT || 8080;
+
+app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
+});
 
 
 // const express = require("express")
